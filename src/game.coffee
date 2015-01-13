@@ -135,7 +135,7 @@ class @Game
 
     return idx in neighborsIdx or
            idx is @positionFromCoord(x, y) or
-           game.data[idx] is game.entities.Mine
+           @data[idx] is @entities.Mine
 
 
   generateBoard: (x, y) ->
@@ -153,7 +153,7 @@ class @Game
 
 
   positionFromCoord: (x, y) ->
-    position = x + y * game.board.nbHorizontalCases
+    position = x + y * @board.nbHorizontalCases
 
 
   isValidPosition: (x, y) ->
@@ -165,14 +165,14 @@ class @Game
     for i in [0...@data.length]
       if @data[i] is @entities.Mine
         [x, y] = @coordFromPosition(i)
-        game.board.cases[i].g.remove()
+        @board.cases[i].g.remove()
         if i is deadPosition
-          game.board.cases[i] = new ExplodedMine @board.board, x, y
+          @board.cases[i] = new ExplodedMine @board.board, x, y
         else
           if @board.cases[i].constructor is Flag
-            game.board.cases[i] = new FlaggedMine @board.board, x, y
+            @board.cases[i] = new FlaggedMine @board.board, x, y
           else
-            game.board.cases[i] = new Mine @board.board, x, y
+            @board.cases[i] = new Mine @board.board, x, y
 
     for i in [0...@board.cases.length]
       if @board.cases[i].constructor is Flag and @data[i] isnt @entities.Mine
