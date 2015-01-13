@@ -43,14 +43,14 @@ class Case
       game.gameOver(casePosition)
       return
 
-    if ++game.safe is game.board.nbHorizontalCases * game.board.nbVerticalCases - game.nbMines
-      console.log "WIN"
-      return
-
     nbMinesAround = @countMines()
 
     game.board.cases[casePosition].g.remove()
     game.board.cases[casePosition] = new TextCase(@ctx, @x, @y, nbMinesAround)
+
+    if ++game.safe is game.board.nbHorizontalCases * game.board.nbVerticalCases - game.nbMines
+      console.log "WIN"
+      return
 
     if nbMinesAround is 0
       for [x, y] in game.neighborCoord @x, @y
