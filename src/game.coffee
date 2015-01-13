@@ -43,8 +43,7 @@ class Case
       game.gameOver(casePosition)
       return
 
-    game.safe++
-    if game.safe is game.board.nbHorizontalCases * game.board.nbVerticalCases - game.nbMines
+    if ++game.safe is game.board.nbHorizontalCases * game.board.nbVerticalCases - game.nbMines
       console.log "WIN"
       return
 
