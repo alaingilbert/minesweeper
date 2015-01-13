@@ -216,24 +216,22 @@ class Board
 class Flag extends Case
   constructor: () ->
     super
-    size = @size
+    @g.append Flag.render @ctx, @size
 
-    rect = @ctx.rect 0, 0, size, size
-    rect.attr fill: '#ddd', stroke: 'gray', strokeWidth: 1
-
-    polygon = @ctx.polygon([size/3, size/2,
+  @render: (ctx, size) ->
+    polygon = ctx.polygon([size/3, size/2,
                             (size/3)*2, size/3,
                             (size/3)*2, (size/3)*2])
     polygon.attr fill: 'red'
 
-    lines = @ctx.polyline([(size/3)*2, size/3,
+    lines = ctx.polyline([(size/3)*2, size/3,
                            (size/3)*2, size-(size/4),
                            size/2, size-(size/4),
                            size-(size/5), size-(size/4)])
     lines.attr stroke: 'black', strokeWidth: size/20, fill: 'transparent'
 
-    group = @ctx.g(rect, polygon, lines)
-    @g.append group
+    group = ctx.g polygon, lines
+    return group
 
 
 class Mine extends Case
@@ -257,21 +255,7 @@ class ExplodedMine extends Case
 class FlaggedMine extends Mine
   constructor: () ->
     super
-    size = @size
-
-    polygon = @ctx.polygon([size/3, size/2,
-                            (size/3)*2, size/3,
-                            (size/3)*2, (size/3)*2])
-    polygon.attr fill: 'red'
-
-    lines = @ctx.polyline([(size/3)*2, size/3,
-                           (size/3)*2, size-(size/4),
-                           size/2, size-(size/4),
-                           size-(size/5), size-(size/4)])
-    lines.attr stroke: 'black', strokeWidth: size/20, fill: 'transparent'
-
-    group = @ctx.g(polygon, lines)
-    @g.append group
+    @g.append Flag.render @ctx, @size
 
 
 class BadFlag extends Flag
