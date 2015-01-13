@@ -164,17 +164,18 @@ class @Game
   showMines: (deadPosition) ->
     for i in [0...@board.cases.length]
       [x, y] = @coordFromPosition(i)
+      params = [@board.board, x, y]
       if @data[i] is @entities.Mine
         @board.cases[i].g.remove()
         if i is deadPosition
-          @board.cases[i] = new ExplodedMine @board.board, x, y
+          @board.cases[i] = new ExplodedMine params...
         else if @board.cases[i].constructor is Flag
-          @board.cases[i] = new FlaggedMine @board.board, x, y
+          @board.cases[i] = new FlaggedMine params...
         else
-          @board.cases[i] = new Mine @board.board, x, y
+          @board.cases[i] = new Mine params...
       else if @board.cases[i].constructor is Flag
         @board.cases[i].g.remove()
-        @board.cases[i] = new BadFlag @board.board, x, y
+        @board.cases[i] = new BadFlag params...
 
 
   gameOver: (deadPosition) =>
