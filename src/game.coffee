@@ -8,30 +8,38 @@ class Case
     @g = @ctx.g @tileBackground
     @g.transform "translate(#{@x * @size}, #{@y * @size})"
 
-    @g.mouseover () =>
-      if game.state isnt game.states.GameOver
-        @tileBackground.attr fill: '#ccc'
+    @g.mouseover @mouseOverHandler
+    @g.mouseout @mouseOutHandler
+    @g.mouseup @mouseUpHandler
 
-    @g.mouseout () =>
-      if game.state isnt game.states.GameOver
-        @tileBackground.attr fill: '#ddd'
 
-    @g.mouseup (evt) =>
-      return if game.state is game.states.GameOver
-      if game.state is game.states.Empty
-        game.initGame @x, @y
+  mouseOverHandler: (evt) =>
+    if game.state isnt game.states.GameOver
+      @tileBackground.attr fill: '#ccc'
 
-      if evt.button is 2 # Right click
-        casePosition = game.positionFromCoord @x, @y
-        game.board.cases[casePosition].g.remove()
-        if game.board.cases[casePosition].constructor is Flag
-          game.board.flagsLbl.attr text: --game.flags
-          game.board.cases[casePosition] = new Case @ctx, @x, @y
-        else
-          game.board.flagsLbl.attr text: ++game.flags
-          game.board.cases[casePosition] = new Flag @ctx, @x, @y
+
+  mouseOutHandler: (evt) =>
+    if game.state isnt game.states.GameOver
+      @tileBackground.attr fill: '#ddd'
+
+
+  mouseUpHandler: (evt) =>
+    return if game.state is game.states.GameOver
+    if game.state is game.states.Empty
+      game.initGame @x, @y
+
+    if evt.button is 2 # Right click
+      casePosition = game.positionFromCoord @x, @y
+      game.board.cases[casePosition].g.remove()
+      if game.board.cases[casePosition].constructor is Flag
+        game.board.flagsLbl.attr text: --game.flags
+        game.board.cases[casePosition] = new Case @ctx, @x, @y
       else
-        @showCase()
+        game.board.flagsLbl.attr text: ++game.flags
+        game.board.cases[casePosition] = new Flag @ctx, @x, @y
+    else
+      @showCase()
+
 
   showCase: () ->
     casePosition = game.positionFromCoord @x, @y
@@ -56,12 +64,14 @@ class Case
       for [x, y] in game.neighborCoord @x, @y
         game.board.cases[game.positionFromCoord(x, y)].showCase()
 
+
   countMines: () ->
     nbMines = 0
     for [x, y] in game.neighborCoord @x, @y
       if game.data[game.positionFromCoord(x, y)] is game.entities.Mine
         nbMines++
     return nbMines
+
 
   countFlags: () ->
     nbFlags = 0
@@ -80,12 +90,7 @@ class TextCase extends Case
     @g.unmouseover()
     @g.unmouseout()
     @g.unmouseup()
-
-    @g.mouseup (evt) =>
-      return if game.state is game.states.GameOver
-      if @countFlags() is @countMines()
-        for [x, y] in game.neighborCoord @x, @y
-          game.board.cases[game.positionFromCoord(x, y)].showCase()
+    @g.mouseup @mouseUpHandler
 
     @tileBackground.attr fill: '#fff'
     text = @ctx.text @size/2, @size/2, @number
@@ -93,6 +98,13 @@ class TextCase extends Case
       fontFamily: 'Arial', fontSize: 38, alignmentBaseline: 'central',
       textAnchor: 'middle', fill: @colors[@number-1]
     @g.append text
+
+
+  mouseUpHandler: (evt) =>
+    return if game.state is game.states.GameOver
+    if @countFlags() is @countMines()
+      for [x, y] in game.neighborCoord @x, @y
+        game.board.cases[game.positionFromCoord(x, y)].showCase()
 
 
 class @Game
@@ -111,6 +123,7 @@ class @Game
   initGame: (x, y) ->
     @state = @states.Playing
     @generateBoard x, y
+
 
   rnd: (min, max) ->
     return Math.floor(Math.random() * (max - min + 1)) + min
@@ -186,14 +199,16 @@ class @Game
 class Board
   constructor: (@id) ->
     @board = Snap(@id)
-
-    @board.mouseup () ->
-      if game.state is game.states.Empty
-        @board.init()
+    @board.mouseup @mouseUpHandler
 
     @nbHorizontalCases = 19
     @nbVerticalCases = 13
     @cases = []
+
+
+  mouseUpHandler: (evt) =>
+    if game.state is game.states.Empty
+      @board.init()
 
 
   createBoard: () ->
@@ -208,11 +223,11 @@ class Board
     @flagsLbl.transform 'translate(0, 580)'
 
 
-
 class Flag extends Case
   constructor: () ->
     super
     @g.append Flag.render @ctx, @size
+
 
   @render: (ctx, size) ->
     polygon = ctx.polygon([size/3, size/2,
