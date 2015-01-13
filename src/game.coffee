@@ -1,4 +1,4 @@
-class Case
+class Tile
   constructor: (@ctx, @x, @y) ->
     @size = 42
 
@@ -33,18 +33,18 @@ class Case
       game.board.cases[casePosition].g.remove()
       if game.board.cases[casePosition].constructor is Flag
         game.board.flagsLbl.attr text: --game.flags
-        game.board.cases[casePosition] = new Case @ctx, @x, @y
+        game.board.cases[casePosition] = new Tile @ctx, @x, @y
       else
         game.board.flagsLbl.attr text: ++game.flags
         game.board.cases[casePosition] = new Flag @ctx, @x, @y
     else
-      @showCase()
+      @showTile()
 
 
-  showCase: () ->
+  showTile: () ->
     casePosition = game.positionFromCoord @x, @y
 
-    if game.board.cases[casePosition].constructor isnt Case
+    if game.board.cases[casePosition].constructor isnt Tile
       return
 
     if game.data[casePosition] is game.entities.Mine
@@ -54,7 +54,7 @@ class Case
     nbMinesAround = @countMines()
 
     game.board.cases[casePosition].g.remove()
-    game.board.cases[casePosition] = new TextCase(@ctx, @x, @y, nbMinesAround)
+    game.board.cases[casePosition] = new TextTile(@ctx, @x, @y, nbMinesAround)
 
     if ++game.safe is game.board.cases.length - game.nbMines
       console.log "WIN"
@@ -62,7 +62,7 @@ class Case
 
     if nbMinesAround is 0
       for [x, y] in game.neighborCoord @x, @y
-        game.board.cases[game.positionFromCoord(x, y)].showCase()
+        game.board.cases[game.positionFromCoord(x, y)].showTile()
 
 
   countMines: () ->
@@ -81,7 +81,7 @@ class Case
     return nbFlags
 
 
-class TextCase extends Case
+class TextTile extends Tile
   constructor: (@ctx, @x, @y, @number) ->
     @colors = ['blue', 'green', 'red', 'navy',
                'maroon', 'aqua', 'purple', 'black']
@@ -104,7 +104,7 @@ class TextCase extends Case
     return if game.state is game.states.GameOver
     if @countFlags() is @countMines()
       for [x, y] in game.neighborCoord @x, @y
-        game.board.cases[game.positionFromCoord(x, y)].showCase()
+        game.board.cases[game.positionFromCoord(x, y)].showTile()
 
 
 class @Game
@@ -154,24 +154,24 @@ class @Game
   generateBoard: (x, y) ->
     for i in [0...@nbMines]
       loop
-        rnd = @rnd(0, (@board.nbHorizontalCases * @board.nbVerticalCases) - 1)
+        rnd = @rnd(0, (@board.nbHorizontalTiles * @board.nbVerticalTiles) - 1)
         break if not @around(rnd, x, y)
       @data[rnd] = @entities.Mine
 
 
   coordFromPosition: (position) ->
-    y = Math.floor(position / @board.nbHorizontalCases)
-    x = position - y * @board.nbHorizontalCases
+    y = Math.floor(position / @board.nbHorizontalTiles)
+    x = position - y * @board.nbHorizontalTiles
     return [x, y]
 
 
   positionFromCoord: (x, y) ->
-    position = x + y * @board.nbHorizontalCases
+    position = x + y * @board.nbHorizontalTiles
 
 
   isValidPosition: (x, y) ->
-    return x >= 0 and x < @board.nbHorizontalCases and
-           y >= 0 and y < @board.nbVerticalCases
+    return x >= 0 and x < @board.nbHorizontalTiles and
+           y >= 0 and y < @board.nbVerticalTiles
 
 
   showMines: (deadPosition) ->
@@ -201,8 +201,8 @@ class Board
     @board = Snap(@id)
     @board.mouseup @mouseUpHandler
 
-    @nbHorizontalCases = 19
-    @nbVerticalCases = 13
+    @nbHorizontalTiles = 19
+    @nbVerticalTiles = 13
     @cases = []
 
 
@@ -212,18 +212,18 @@ class Board
 
 
   createBoard: () ->
-    nbCases = @nbHorizontalCases * @nbVerticalCases
-    for i in [0...nbCases]
-      y = Math.floor(i / @nbHorizontalCases)
-      x = i - y * @nbHorizontalCases
-      tmp = new Case @board, x, y
+    nbTiles = @nbHorizontalTiles * @nbVerticalTiles
+    for i in [0...nbTiles]
+      y = Math.floor(i / @nbHorizontalTiles)
+      x = i - y * @nbHorizontalTiles
+      tmp = new Tile @board, x, y
       @cases[i] = tmp
 
     @flagsLbl = @board.text 0, 0, 'Flags'
     @flagsLbl.transform 'translate(0, 580)'
 
 
-class Flag extends Case
+class Flag extends Tile
   constructor: () ->
     super
     @g.append Flag.render @ctx, @size
@@ -245,7 +245,7 @@ class Flag extends Case
     return group
 
 
-class Mine extends Case
+class Mine extends Tile
   constructor: () ->
     super
     circle = @ctx.circle @size/2, @size/2, @size/4
@@ -254,7 +254,7 @@ class Mine extends Case
     @g.append group
 
 
-class ExplodedMine extends Case
+class ExplodedMine extends Tile
   constructor: () ->
     super
     circle = @ctx.circle @size/2, @size/2, @size/4
