@@ -91,10 +91,6 @@ class TextCase extends Case
     @g.append text
 
 
-class Mine extends Case
-  constructor: () ->
-
-
 class @Game
   constructor: (id) ->
     @states = Empty: 0, Playing: 1, GameOver: 2
