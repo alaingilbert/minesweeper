@@ -48,7 +48,7 @@ class Case
     game.board.cases[casePosition].g.remove()
     game.board.cases[casePosition] = new TextCase(@ctx, @x, @y, nbMinesAround)
 
-    if ++game.safe is game.board.nbHorizontalCases * game.board.nbVerticalCases - game.nbMines
+    if ++game.safe is game.board.cases.length - game.nbMines
       console.log "WIN"
       return
 
@@ -59,19 +59,22 @@ class Case
   countMines: () ->
     nbMines = 0
     for [x, y] in game.neighborCoord @x, @y
-      nbMines++ if game.data[game.positionFromCoord(x, y)] is game.entities.Mine
+      if game.data[game.positionFromCoord(x, y)] is game.entities.Mine
+        nbMines++
     return nbMines
 
   countFlags: () ->
     nbFlags = 0
     for [x, y] in game.neighborCoord @x, @y
-      nbFlags++ if game.board.cases[game.positionFromCoord(x, y)].constructor is Flag
+      if game.board.cases[game.positionFromCoord(x, y)].constructor is Flag
+        nbFlags++
     return nbFlags
 
 
 class TextCase extends Case
   constructor: (@ctx, @x, @y, @number) ->
-    @colors = ['blue', 'green', 'red', 'navy', 'maroon', 'aqua', 'purple', 'black']
+    @colors = ['blue', 'green', 'red', 'navy',
+               'maroon', 'aqua', 'purple', 'black']
 
     super
     @g.unmouseover()
@@ -86,7 +89,9 @@ class TextCase extends Case
 
     @tileBackground.attr fill: '#fff'
     text = @ctx.text @size/2, @size/2, @number
-    text.attr fontFamily: 'Arial', fontSize: 38, alignmentBaseline: 'central', textAnchor: 'middle', fill: @colors[@number-1]
+    text.attr
+      fontFamily: 'Arial', fontSize: 38, alignmentBaseline: 'central',
+      textAnchor: 'middle', fill: @colors[@number-1]
     @g.append text
 
 
@@ -126,9 +131,9 @@ class @Game
 
   around: (idx, x, y) ->
     neighbors = @neighborCoord x, y
-    neighborsIdx = [@positionFromCoord(item[0], item[1]) for item in neighbors][0]
+    neighborsIdx = [@positionFromCoord(item[0], item[1]) for item in neighbors]
 
-    return idx in neighborsIdx or
+    return idx in neighborsIdx[0] or
            idx is @positionFromCoord(x, y) or
            @data[idx] is @entities.Mine
 
