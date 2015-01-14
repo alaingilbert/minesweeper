@@ -50,24 +50,27 @@
         return;
       }
       if (game.state.is(StateManager.Empty)) {
-        game.initGame(this.x, this.y);
-      }
-      if (evt.button === 2) {
-        casePosition = game.positionFromCoord(this.x, this.y);
-        game.board.cases[casePosition].g.remove();
-        if (game.board.cases[casePosition].constructor === Flag) {
-          game.board.flagsLbl.attr({
-            text: "Flags: " + (--game.flags) + "/" + game.nbMines
-          });
-          return game.board.cases[casePosition] = new Tile(this.ctx, this.x, this.y);
-        } else {
-          game.board.flagsLbl.attr({
-            text: "Flags: " + (++game.flags) + "/" + game.nbMines
-          });
-          return game.board.cases[casePosition] = new Flag(this.ctx, this.x, this.y);
+        if (evt.button === 0) {
+          game.initGame(this.x, this.y);
         }
-      } else {
-        return this.showTile();
+      }
+      if (game.state.is(StateManager.Playing)) {
+        if (evt.button === 2) {
+          casePosition = game.positionFromCoord(this.x, this.y);
+          game.board.cases[casePosition].g.remove();
+          if (game.board.cases[casePosition].constructor === Flag) {
+            game.flags--;
+            game.board.cases[casePosition] = new Tile(this.ctx, this.x, this.y);
+          } else {
+            game.flags++;
+            game.board.cases[casePosition] = new Flag(this.ctx, this.x, this.y);
+          }
+          return game.board.flagsLbl.attr({
+            text: "Flags: " + game.flags + "/" + game.nbMines
+          });
+        } else {
+          return this.showTile();
+        }
       }
     };
 
@@ -408,8 +411,6 @@
       } else if (game.state.is(StateManager.GameOver)) {
         game.reset();
         return game.state.set(StateManager.Empty);
-      } else if (game.state.is(StateManager.Empty)) {
-        return this.board.init();
       }
     };
 
