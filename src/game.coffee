@@ -14,28 +14,28 @@ class Tile
 
 
   mouseOverHandler: (evt) =>
-    if game.state isnt game.states.GameOver
+    if not game.state.is StateManager.GameOver
       @tileBackground.attr fill: '#ccc'
 
 
   mouseOutHandler: (evt) =>
-    if game.state isnt game.states.GameOver
+    if not game.state.is StateManager.GameOver
       @tileBackground.attr fill: '#ddd'
 
 
   mouseUpHandler: (evt) =>
-    return if game.state is game.states.GameOver
-    if game.state is game.states.Empty
+    return if game.state.is StateManager.GameOver
+    if game.state.is StateManager.Empty
       game.initGame @x, @y
 
     if evt.button is 2 # Right click
       casePosition = game.positionFromCoord @x, @y
       game.board.cases[casePosition].g.remove()
       if game.board.cases[casePosition].constructor is Flag
-        game.board.flagsLbl.attr text: --game.flags
+        game.board.flagsLbl.attr text: "Flags: #{--game.flags}/#{game.nbMines}"
         game.board.cases[casePosition] = new Tile @ctx, @x, @y
       else
-        game.board.flagsLbl.attr text: ++game.flags
+        game.board.flagsLbl.attr text: "Flags: #{++game.flags}/#{game.nbMines}"
         game.board.cases[casePosition] = new Flag @ctx, @x, @y
     else
       @showTile()
@@ -48,7 +48,7 @@ class Tile
       return
 
     if game.data[casePosition] is game.entities.Mine
-      game.gameOver(casePosition)
+      game.willDie = casePosition
       return
 
     nbMinesAround = @countMines()
@@ -56,9 +56,7 @@ class Tile
     game.board.cases[casePosition].g.remove()
     game.board.cases[casePosition] = new TextTile(@ctx, @x, @y, nbMinesAround)
 
-    if ++game.safe is game.board.cases.length - game.nbMines
-      console.log "WIN"
-      return
+    game.safe++
 
     if nbMinesAround is 0
       for [x, y] in game.neighborCoord @x, @y
@@ -101,7 +99,7 @@ class TextTile extends Tile
 
 
   mouseUpHandler: (evt) =>
-    return if game.state is game.states.GameOver
+    return if game.state.is StateManager.GameOver
     if @countFlags() is @countMines()
       for [x, y] in game.neighborCoord @x, @y
         game.board.cases[game.positionFromCoord(x, y)].showTile()
@@ -109,19 +107,19 @@ class TextTile extends Tile
 
 class @Game
   constructor: (id) ->
-    @states = Empty: 0, Playing: 1, GameOver: 2
-    @state = @states.Empty
+    @state = new StateManager()
     @entities = Empty: 0, Mine: 1, Flag: 2
     @nbMines = 50
     @flags = 0
     @safe = 0
     @data = []
+    @willDie = false
     @board = new Board id
     @board.createBoard()
 
 
   initGame: (x, y) ->
-    @state = @states.Playing
+    @state.set StateManager.Playing
     @generateBoard x, y
 
 
@@ -192,8 +190,46 @@ class @Game
 
 
   gameOver: (deadPosition) =>
-    @state = @states.GameOver
+    @state.set StateManager.GameOver
     @showMines(deadPosition)
+
+
+  win: () ->
+    @state.set StateManager.Win
+    background = @board.board.rect 0, 0, 42*19, 42*13
+    background.attr fill: 'rgba(255, 255, 255, 0.7)'
+    winLbl = @board.board.text 42*19/2, 42*13/2, 'Win'
+    winLbl.attr
+      fontSize: 40, fontFamily: 'Arial', fill: 'green',
+      alignmentBaseline: 'central', textAnchor: 'middle'
+
+
+  reset: () ->
+    @safe = 0
+    @flags = 0
+    @data = []
+    @willDie = false
+    @board.reset()
+
+
+class StateManager
+  constructor: () ->
+    @delay = 0
+    @state = StateManager.Empty
+
+
+  is: (state) ->
+    @state is state
+
+
+  set: (state) ->
+    @state = state
+
+
+  @Empty = 0
+  @Playing = 1
+  @GameOver = 2
+  @Win = 3
 
 
 class Board
@@ -207,7 +243,19 @@ class Board
 
 
   mouseUpHandler: (evt) =>
-    if game.state is game.states.Empty
+    if game.state.is StateManager.Playing
+      if game.safe is game.board.cases.length - game.nbMines
+        game.win()
+        return
+      if game.willDie isnt false
+        game.gameOver(game.willDie)
+    else if game.state.is StateManager.Win
+      game.reset()
+      game.state.set StateManager.Empty
+    else if game.state.is StateManager.GameOver
+      game.reset()
+      game.state.set StateManager.Empty
+    else if game.state.is StateManager.Empty
       @board.init()
 
 
@@ -219,8 +267,13 @@ class Board
       tmp = new Tile @board, x, y
       @cases[i] = tmp
 
-    @flagsLbl = @board.text 0, 0, 'Flags'
+    @flagsLbl = @board.text 0, 0, "Flags: 0/50"
     @flagsLbl.transform 'translate(0, 580)'
+
+
+  reset: () ->
+    @board.clear()
+    @createBoard()
 
 
 class Flag extends Tile
