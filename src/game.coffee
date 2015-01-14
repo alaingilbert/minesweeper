@@ -32,11 +32,12 @@ class Tile
       casePosition = game.positionFromCoord @x, @y
       game.board.cases[casePosition].g.remove()
       if game.board.cases[casePosition].constructor is Flag
-        game.board.flagsLbl.attr text: "Flags: #{--game.flags}/#{game.nbMines}"
+        game.flags--
         game.board.cases[casePosition] = new Tile @ctx, @x, @y
       else
-        game.board.flagsLbl.attr text: "Flags: #{++game.flags}/#{game.nbMines}"
+        game.flags++
         game.board.cases[casePosition] = new Flag @ctx, @x, @y
+      game.board.flagsLbl.attr text: "Flags: #{game.flags}/#{game.nbMines}"
     else
       @showTile()
 
