@@ -26,20 +26,22 @@ class Tile
   mouseUpHandler: (evt) =>
     return if game.state.is StateManager.GameOver
     if game.state.is StateManager.Empty
-      game.initGame @x, @y
+      if evt.button is 0 # Left click
+        game.initGame @x, @y
 
-    if evt.button is 2 # Right click
-      casePosition = game.positionFromCoord @x, @y
-      game.board.cases[casePosition].g.remove()
-      if game.board.cases[casePosition].constructor is Flag
-        game.flags--
-        game.board.cases[casePosition] = new Tile @ctx, @x, @y
+    if game.state.is StateManager.Playing
+      if evt.button is 2 # Right click
+        casePosition = game.positionFromCoord @x, @y
+        game.board.cases[casePosition].g.remove()
+        if game.board.cases[casePosition].constructor is Flag
+          game.flags--
+          game.board.cases[casePosition] = new Tile @ctx, @x, @y
+        else
+          game.flags++
+          game.board.cases[casePosition] = new Flag @ctx, @x, @y
+        game.board.flagsLbl.attr text: "Flags: #{game.flags}/#{game.nbMines}"
       else
-        game.flags++
-        game.board.cases[casePosition] = new Flag @ctx, @x, @y
-      game.board.flagsLbl.attr text: "Flags: #{game.flags}/#{game.nbMines}"
-    else
-      @showTile()
+        @showTile()
 
 
   showTile: () ->
@@ -256,8 +258,6 @@ class Board
     else if game.state.is StateManager.GameOver
       game.reset()
       game.state.set StateManager.Empty
-    else if game.state.is StateManager.Empty
-      @board.init()
 
 
   createBoard: () ->
