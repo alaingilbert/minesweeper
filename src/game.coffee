@@ -112,7 +112,7 @@ class TextTile extends Tile
 class @Game
   constructor: (id) ->
     @state = States.Empty
-    @entities = Empty: 0, Mine: 1, Flag: 2
+    @entities = Mine: 1
     @nbMines = 50
     @flags = 0
     @safe = 0
