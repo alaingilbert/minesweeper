@@ -235,18 +235,18 @@ class Board
 
 
   mouseUpHandler: (evt) =>
-    if game.state is States.Playing
-      if game.safe is game.board.cases.length - game.nbMines
-        game.win()
-        return
-      if game.willDie isnt false
-        game.gameOver(game.willDie)
-    else if game.state is States.Win
-      game.reset()
-      game.state = States.Empty
-    else if game.state is States.GameOver
-      game.reset()
-      game.state = States.Empty
+    switch game.state
+      when States.Playing
+        if game.safe is game.board.cases.length - game.nbMines
+          return game.win()
+        if game.willDie isnt false
+          game.gameOver(game.willDie)
+      when States.Win
+        game.reset()
+        game.state = States.Empty
+      when States.GameOver
+        game.reset()
+        game.state = States.Empty
 
 
   createBoard: () ->
