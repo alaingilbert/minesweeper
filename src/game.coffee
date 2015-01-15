@@ -51,7 +51,7 @@ class Tile
     if game.board.cases[casePosition].constructor isnt Tile
       return
 
-    if game.data[casePosition] is game.entities.Mine
+    if game.isMine casePosition
       game.willDie = casePosition
       return
 
