@@ -171,21 +171,27 @@ class @Game
            y >= 0 and y < @board.nbVerticalTiles
 
 
+  isMine: (i) -> @data[i] is @entities.Mine
+
+
+  isFlag: (i) -> @board.cases[i].constructor is Flag
+
+
   showMines: (deadPosition) ->
     for i in [0...@board.cases.length]
       [x, y] = @coordFromPosition(i)
       params = [@board.board, x, y]
-      if @data[i] is @entities.Mine
+      if @isMine(i) or @isFlag(i)
         @board.cases[i].g.remove()
         if i is deadPosition
-          @board.cases[i] = new ExplodedMine params...
-        else if @board.cases[i].constructor is Flag
-          @board.cases[i] = new FlaggedMine params...
+          newTileClass = ExplodedMine
+        else if @isMine(i) and @isFlag(i)
+          newTileClass = FlaggedMine
+        else if @isFlag(i)
+          newTileClass = BadFlag
         else
-          @board.cases[i] = new Mine params...
-      else if @board.cases[i].constructor is Flag
-        @board.cases[i].g.remove()
-        @board.cases[i] = new BadFlag params...
+          newTileClass = Mine
+        @board.cases[i] = new newTileClass params...
 
 
   gameOver: (deadPosition) =>
