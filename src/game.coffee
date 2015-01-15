@@ -114,7 +114,7 @@ class @Game
   constructor: (id) ->
     @state = States.Empty
     @entities = Mine: 1
-    @nbMines = 50
+    @nbMines = 2
     @flags = 0
     @safe = 0
     @data = []
@@ -213,6 +213,7 @@ class @Game
 
   win: () ->
     @state =States.Win
+    @showMines()
     background = @board.board.rect 0, 0, 42*19, 42*13
     background.attr fill: 'rgba(255, 255, 255, 0.7)'
     winLbl = @board.board.text 42*19/2, 42*13/2, 'Win'
