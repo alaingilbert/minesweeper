@@ -63,7 +63,7 @@ class Tile
 
     if nbMinesAround is 0
       for [x, y] in game.neighborCoord @x, @y
-        game.board.cases[game.positionFromCoord(x, y)].showTile()
+        game.showTile x, y
 
 
   countMines: () ->
@@ -105,7 +105,7 @@ class TextTile extends Tile
     return if game.state is States.GameOver
     if @countFlags() is @countMines()
       for [x, y] in game.neighborCoord @x, @y
-        game.board.cases[game.positionFromCoord(x, y)].showTile()
+        game.showTile x, y
 
 
 class @Game
@@ -154,6 +154,10 @@ class @Game
         rnd = @rnd(0, (@board.nbHorizontalTiles * @board.nbVerticalTiles) - 1)
         break if not @around(rnd, x, y)
       @data[rnd] = @entities.Mine
+
+
+  showTile: (x, y) ->
+    @board.cases[@positionFromCoord(x, y)].showTile()
 
 
   coordFromPosition: (position) ->
