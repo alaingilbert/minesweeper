@@ -14,22 +14,22 @@ class Tile
 
 
   mouseOverHandler: (evt) =>
-    if not game.state.is StateManager.GameOver
+    if not game.state is States.GameOver
       @tileBackground.attr fill: '#ccc'
 
 
   mouseOutHandler: (evt) =>
-    if not game.state.is StateManager.GameOver
+    if not game.state is States.GameOver
       @tileBackground.attr fill: '#ddd'
 
 
   mouseUpHandler: (evt) =>
-    return if game.state.is StateManager.GameOver
-    if game.state.is StateManager.Empty
+    return if game.state is States.GameOver
+    if game.state is States.Empty
       if evt.button is 0 # Left click
         game.initGame @x, @y
 
-    if game.state.is StateManager.Playing
+    if game.state is States.Playing
       if evt.button is 2 # Right click
         casePosition = game.positionFromCoord @x, @y
         game.board.cases[casePosition].g.remove()
@@ -102,7 +102,7 @@ class TextTile extends Tile
 
 
   mouseUpHandler: (evt) =>
-    return if game.state.is StateManager.GameOver
+    return if game.state is States.GameOver
     if @countFlags() is @countMines()
       for [x, y] in game.neighborCoord @x, @y
         game.board.cases[game.positionFromCoord(x, y)].showTile()
@@ -110,7 +110,7 @@ class TextTile extends Tile
 
 class @Game
   constructor: (id) ->
-    @state = new StateManager()
+    @state = States.Empty
     @entities = Empty: 0, Mine: 1, Flag: 2
     @nbMines = 50
     @flags = 0
@@ -122,7 +122,7 @@ class @Game
 
 
   initGame: (x, y) ->
-    @state.set StateManager.Playing
+    @state = States.Playing
     @generateBoard x, y
 
 
@@ -195,12 +195,12 @@ class @Game
 
 
   gameOver: (deadPosition) =>
-    @state.set StateManager.GameOver
+    @state = States.GameOver
     @showMines(deadPosition)
 
 
   win: () ->
-    @state.set StateManager.Win
+    @state =States.Win
     background = @board.board.rect 0, 0, 42*19, 42*13
     background.attr fill: 'rgba(255, 255, 255, 0.7)'
     winLbl = @board.board.text 42*19/2, 42*13/2, 'Win'
@@ -217,20 +217,7 @@ class @Game
     @board.reset()
 
 
-class StateManager
-  constructor: () ->
-    @delay = 0
-    @state = StateManager.Empty
-
-
-  is: (state) ->
-    @state is state
-
-
-  set: (state) ->
-    @state = state
-
-
+class States
   @Empty = 0
   @Playing = 1
   @GameOver = 2
@@ -248,18 +235,18 @@ class Board
 
 
   mouseUpHandler: (evt) =>
-    if game.state.is StateManager.Playing
+    if game.state is States.Playing
       if game.safe is game.board.cases.length - game.nbMines
         game.win()
         return
       if game.willDie isnt false
         game.gameOver(game.willDie)
-    else if game.state.is StateManager.Win
+    else if game.state is States.Win
       game.reset()
-      game.state.set StateManager.Empty
-    else if game.state.is StateManager.GameOver
+      game.state = States.Empty
+    else if game.state is States.GameOver
       game.reset()
-      game.state.set StateManager.Empty
+      game.state = States.Empty
 
 
   createBoard: () ->
