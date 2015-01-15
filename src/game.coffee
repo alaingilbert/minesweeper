@@ -132,14 +132,10 @@ class @Game
 
   neighborCoord: (x, y) ->
     result = []
-    result.push([x - 1, y - 1]) if @isValidPosition(x - 1, y - 1)
-    result.push([x - 0, y - 1]) if @isValidPosition(x - 0, y - 1)
-    result.push([x + 1, y - 1]) if @isValidPosition(x + 1, y - 1)
-    result.push([x - 1, y - 0]) if @isValidPosition(x - 1, y - 0)
-    result.push([x + 1, y - 0]) if @isValidPosition(x + 1, y - 0)
-    result.push([x - 1, y + 1]) if @isValidPosition(x - 1, y + 1)
-    result.push([x - 0, y + 1]) if @isValidPosition(x - 0, y + 1)
-    result.push([x + 1, y + 1]) if @isValidPosition(x + 1, y + 1)
+    for dx in [-1..1]
+      for dy in [-1..1]
+        if not (dx is 0 and dy is 0)
+          result.push [x + dx, y + dy] if @isValidPosition x + dx, y + dy
     return result
 
 
