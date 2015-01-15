@@ -139,13 +139,19 @@ class @Game
     return result
 
 
-  around: (idx, x, y) ->
-    neighbors = @neighborCoord x, y
-    neighborsIdx = [@positionFromCoord(item[0], item[1]) for item in neighbors]
+  neighborIdx: (idx) ->
+    [x, y] = @coordFromPosition idx
+    neighbors = @neighborCoord(x, y)
+    return [@positionFromCoord(item[0], item[1]) for item in neighbors][0]
 
-    return idx in neighborsIdx[0] or
-           idx is @positionFromCoord(x, y) or
-           @data[idx] is @entities.Mine
+
+  around: (idx, x, y) ->
+    initialClickPosition = @positionFromCoord x, y
+    neighborsIdx = @neighborIdx initialClickPosition
+
+    return idx in neighborsIdx or
+           idx is initialClickPosition or
+           @isMine idx
 
 
   generateBoard: (x, y) ->
