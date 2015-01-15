@@ -31,14 +31,15 @@ class Tile
 
     if game.state is States.Playing
       if evt.button is 2 # Right click
-        casePosition = game.positionFromCoord @x, @y
-        game.board.cases[casePosition].g.remove()
-        if game.board.cases[casePosition].constructor is Flag
+        tilePosition = game.positionFromCoord @x, @y
+        if game.isFlag tilePosition
           game.flags--
-          game.board.cases[casePosition] = new Tile @ctx, @x, @y
+          newTileClass = Tile
         else
           game.flags++
-          game.board.cases[casePosition] = new Flag @ctx, @x, @y
+          newTileClass = Flag
+        game.board.cases[tilePosition].g.remove()
+        game.board.cases[tilePosition] = new newTileClass @ctx, @x, @y
         game.board.flagsLbl.attr text: "Flags: #{game.flags}/#{game.nbMines}"
       else
         @showTile()
