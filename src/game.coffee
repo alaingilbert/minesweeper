@@ -69,7 +69,7 @@ class Tile
   countMines: () ->
     nbMines = 0
     for [x, y] in game.neighborCoord @x, @y
-      if game.data[game.positionFromCoord(x, y)] is game.entities.Mine
+      if game.isMine(game.positionFromCoord(x, y))
         nbMines++
     return nbMines
 
@@ -77,7 +77,7 @@ class Tile
   countFlags: () ->
     nbFlags = 0
     for [x, y] in game.neighborCoord @x, @y
-      if game.board.cases[game.positionFromCoord(x, y)].constructor is Flag
+      if game.isFlag(game.positionFromCoord(x, y))
         nbFlags++
     return nbFlags
 
