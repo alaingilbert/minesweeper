@@ -55,7 +55,7 @@ class Tile
       game.willDie = casePosition
       return
 
-    nbMinesAround = @countMines()
+    nbMinesAround = @countMinesAround()
 
     game.board.cases[casePosition].g.remove()
     game.board.cases[casePosition] = new TextTile(@ctx, @x, @y, nbMinesAround)
@@ -67,7 +67,7 @@ class Tile
         game.showTile x, y
 
 
-  countMines: () ->
+  countMinesAround: () ->
     nbMines = 0
     for [x, y] in game.neighborCoord @x, @y
       if game.isMine(game.positionFromCoord(x, y))
@@ -75,7 +75,7 @@ class Tile
     return nbMines
 
 
-  countFlags: () ->
+  countFlagsAround: () ->
     nbFlags = 0
     for [x, y] in game.neighborCoord @x, @y
       if game.isFlag(game.positionFromCoord(x, y))
@@ -103,10 +103,11 @@ class TextTile extends Tile
 
 
   mouseUpHandler: (evt) =>
-    return if game.state is States.GameOver
-    if @countFlags() is @countMines()
-      for [x, y] in game.neighborCoord @x, @y
-        game.showTile x, y
+    switch game.state
+      when States.Playing
+        if @countFlagsAround() is @countMinesAround()
+          for [x, y] in game.neighborCoord @x, @y
+            game.showTile x, y
 
 
 class @Game
