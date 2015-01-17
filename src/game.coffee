@@ -97,7 +97,7 @@ class TextTile extends Tile
     @tileBackground.attr fill: '#fff'
     text = @ctx.text @size/2, @size/2, @number
     text.attr
-      fontFamily: 'Arial', fontSize: 38, alignmentBaseline: 'central',
+      fontFamily: 'Arial', fontSize: 38, dominantBaseline: 'central',
       textAnchor: 'middle', fill: @colors[@number-1]
     @g.append text
 
