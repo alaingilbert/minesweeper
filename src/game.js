@@ -187,7 +187,7 @@
       this.entities = {
         Mine: 1
       };
-      this.nbMines = 2;
+      this.nbMines = 50;
       this.flags = 0;
       this.safe = 0;
       this.data = [];
