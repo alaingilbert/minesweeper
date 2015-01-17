@@ -114,7 +114,7 @@ class @Game
   constructor: (id) ->
     @state = States.Empty
     @entities = Mine: 1
-    @nbMines = 2
+    @nbMines = 50
     @flags = 0
     @safe = 0
     @data = []
