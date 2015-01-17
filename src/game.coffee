@@ -219,7 +219,7 @@ class @Game
     winLbl = @board.board.text 42*19/2, 42*13/2, 'Win'
     winLbl.attr
       fontSize: 40, fontFamily: 'Arial', fill: 'green',
-      alignmentBaseline: 'central', textAnchor: 'middle'
+      dominantBaseline: 'central', textAnchor: 'middle'
 
 
   reset: () ->
