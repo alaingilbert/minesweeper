@@ -64,8 +64,7 @@
             game.flags++;
             newTileClass = Flag;
           }
-          game.board.cases[tilePosition].g.remove();
-          game.board.cases[tilePosition] = new newTileClass(this.ctx, this.x, this.y);
+          game.setFlag(this.ctx, this.x, this.y);
           return game.board.flagsLbl.attr({
             text: "Flags: " + game.flags + "/" + game.nbMines
           });
@@ -205,6 +204,13 @@
       return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 
+    Game.prototype.setFlag = function(ctx, x, y) {
+      var tilePosition;
+      tilePosition = this.positionFromCoord(x, y);
+      this.board.cases[tilePosition].g.remove();
+      return this.board.cases[tilePosition] = new Flag(ctx, x, y);
+    };
+
     Game.prototype.neighborCoord = function(x, y) {
       var dx, dy, result, _i, _j;
       result = [];
@@ -334,7 +340,7 @@
         fontSize: 40,
         fontFamily: 'Arial',
         fill: 'green',
-        alignmentBaseline: 'central',
+        dominantBaseline: 'central',
         textAnchor: 'middle'
       });
     };
