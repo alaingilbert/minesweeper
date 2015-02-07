@@ -13,3 +13,9 @@ bower install
 ```
 coffee -wc ./
 ```
+
+#Lol
+
+```
+for(var i=0;i<game.data.length;i++){if(game.data[i]){y=Math.floor(i/game.board.nbHorizontalTiles);x=i-y*game.board.nbHorizontalTiles;game.setFlag(game.board.board,x,y)}}
+```
