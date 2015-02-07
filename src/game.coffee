@@ -38,8 +38,7 @@ class Tile
         else
           game.flags++
           newTileClass = Flag
-        game.board.cases[tilePosition].g.remove()
-        game.board.cases[tilePosition] = new newTileClass @ctx, @x, @y
+        game.setFlag @ctx, @x, @y
         game.board.flagsLbl.attr text: "Flags: #{game.flags}/#{game.nbMines}"
       else
         @showTile()
@@ -130,6 +129,12 @@ class @Game
 
   rnd: (min, max) ->
     return Math.floor(Math.random() * (max - min + 1)) + min
+
+
+  setFlag: (ctx, x, y) ->
+    tilePosition = @positionFromCoord x, y
+    @board.cases[tilePosition].g.remove()
+    @board.cases[tilePosition] = new Flag ctx, x, y
 
 
   neighborCoord: (x, y) ->
