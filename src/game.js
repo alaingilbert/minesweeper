@@ -45,7 +45,7 @@
     };
 
     Tile.prototype.mouseUpHandler = function(evt) {
-      var newTileClass, tilePosition;
+      var tilePosition;
       if (game.state === States.GameOver) {
         return;
       }
@@ -58,16 +58,10 @@
         if (evt.button === 2) {
           tilePosition = game.positionFromCoord(this.x, this.y);
           if (game.isFlag(tilePosition)) {
-            game.flags--;
-            newTileClass = Tile;
+            return game.removeFlag(this.x, this.y);
           } else {
-            game.flags++;
-            newTileClass = Flag;
+            return game.setFlag(this.x, this.y);
           }
-          game.setFlag(this.ctx, this.x, this.y);
-          return game.board.flagsLbl.attr({
-            text: "Flags: " + game.flags + "/" + game.nbMines
-          });
         } else {
           return this.showTile();
         }
@@ -204,11 +198,26 @@
       return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 
-    Game.prototype.setFlag = function(ctx, x, y) {
+    Game.prototype.removeFlag = function(x, y) {
       var tilePosition;
+      this.flags--;
       tilePosition = this.positionFromCoord(x, y);
       this.board.cases[tilePosition].g.remove();
-      return this.board.cases[tilePosition] = new Flag(ctx, x, y);
+      this.board.cases[tilePosition] = new Tile(this.board.board, x, y);
+      return this.board.flagsLbl.attr({
+        text: "Flags: " + game.flags + "/" + game.nbMines
+      });
+    };
+
+    Game.prototype.setFlag = function(x, y) {
+      var tilePosition;
+      this.flags++;
+      tilePosition = this.positionFromCoord(x, y);
+      this.board.cases[tilePosition].g.remove();
+      this.board.cases[tilePosition] = new Flag(this.board.board, x, y);
+      return this.board.flagsLbl.attr({
+        text: "Flags: " + game.flags + "/" + game.nbMines
+      });
     };
 
     Game.prototype.neighborCoord = function(x, y) {
