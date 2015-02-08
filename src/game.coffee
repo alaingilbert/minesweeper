@@ -31,11 +31,7 @@ class Tile
 
     if game.state is States.Playing
       if evt.button is 2 # Right click
-        tilePosition = game.positionFromCoord @x, @y
-        if game.isFlag tilePosition
-          game.removeFlag @x, @y
-        else
-          game.setFlag @x, @y
+        game.toggleFlag @x, @y
       else
         @showTile()
 
@@ -127,19 +123,18 @@ class @Game
     return Math.floor(Math.random() * (max - min + 1)) + min
 
 
-  removeFlag: (x, y) ->
-    @flags--
+  toggleFlag: (x, y) ->
     tilePosition = @positionFromCoord x, y
     @board.cases[tilePosition].g.remove()
-    @board.cases[tilePosition] = new Tile @board.board, x, y
-    @board.flagsLbl.attr text: "Flags: #{game.flags}/#{game.nbMines}"
 
+    if @isFlag tilePosition
+      @flags--
+      newTileClass = Tile
+    else
+      @flags++
+      newTileClass = Flag
 
-  setFlag: (x, y) ->
-    @flags++
-    tilePosition = @positionFromCoord x, y
-    @board.cases[tilePosition].g.remove()
-    @board.cases[tilePosition] = new Flag @board.board, x, y
+    @board.cases[tilePosition] = new newTileClass @board.board, x, y
     @board.flagsLbl.attr text: "Flags: #{game.flags}/#{game.nbMines}"
 
 
