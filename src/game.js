@@ -45,7 +45,6 @@
     };
 
     Tile.prototype.mouseUpHandler = function(evt) {
-      var tilePosition;
       if (game.state === States.GameOver) {
         return;
       }
@@ -56,12 +55,7 @@
       }
       if (game.state === States.Playing) {
         if (evt.button === 2) {
-          tilePosition = game.positionFromCoord(this.x, this.y);
-          if (game.isFlag(tilePosition)) {
-            return game.removeFlag(this.x, this.y);
-          } else {
-            return game.setFlag(this.x, this.y);
-          }
+          return game.toggleFlag(this.x, this.y);
         } else {
           return this.showTile();
         }
@@ -198,23 +192,18 @@
       return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 
-    Game.prototype.removeFlag = function(x, y) {
-      var tilePosition;
-      this.flags--;
+    Game.prototype.toggleFlag = function(x, y) {
+      var newTileClass, tilePosition;
       tilePosition = this.positionFromCoord(x, y);
       this.board.cases[tilePosition].g.remove();
-      this.board.cases[tilePosition] = new Tile(this.board.board, x, y);
-      return this.board.flagsLbl.attr({
-        text: "Flags: " + game.flags + "/" + game.nbMines
-      });
-    };
-
-    Game.prototype.setFlag = function(x, y) {
-      var tilePosition;
-      this.flags++;
-      tilePosition = this.positionFromCoord(x, y);
-      this.board.cases[tilePosition].g.remove();
-      this.board.cases[tilePosition] = new Flag(this.board.board, x, y);
+      if (this.isFlag(tilePosition)) {
+        this.flags--;
+        newTileClass = Tile;
+      } else {
+        this.flags++;
+        newTileClass = Flag;
+      }
+      this.board.cases[tilePosition] = new newTileClass(this.board.board, x, y);
       return this.board.flagsLbl.attr({
         text: "Flags: " + game.flags + "/" + game.nbMines
       });
